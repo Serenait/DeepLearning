@@ -72,48 +72,60 @@ xxx = torch.tensor(xx)
 
 
 # pandas 数据预处理
-import os
-os.makedirs(os.path.join('.','data'),exist_ok=True)  # 在当前文件的目录下创建一个 data 文件夹
-data_file = os.path.join('.','data','house_tiny.csv')
-# with open(文件名，模式【w or r】)  as f: w: 写入文件，如果文件存在就覆盖，r: 读取文件，如果文件不存在就报错
-with open(data_file,'w',encoding='utf-8') as f: 
-    f.write('NumRooms,Alley,Price\n')  # 写入表头
-    f.write('NA,Pave,127500\n')  # 写入数据
-    f.write('2,NA,106000\n')
-    f.write('4,NA,178100\n')
-    f.write('NA,NA,140000\n')
+# import os
+# os.makedirs(os.path.join('.','data'),exist_ok=True)  # 在当前文件的目录下创建一个 data 文件夹
+# data_file = os.path.join('.','data','house_tiny.csv')
+# # with open(文件名，模式【w or r】)  as f: w: 写入文件，如果文件存在就覆盖，r: 读取文件，如果文件不存在就报错
+# with open(data_file,'w',encoding='utf-8') as f: 
+#     f.write('NumRooms,Alley,Price\n')  # 写入表头
+#     f.write('NA,Pave,127500\n')  # 写入数据
+#     f.write('2,NA,106000\n')
+#     f.write('4,NA,178100\n')
+#     f.write('NA,NA,140000\n')
 
-import pandas as pd
-data = pd.read_csv(data_file)  # 读取数据 在读取时，会自动把刚才文件里的文本 NA 识别并转换成了 NaN（Not a Number，真正的空值）。
-print(data)
+# import pandas as pd
+# data = pd.read_csv(data_file)  # 读取数据 在读取时，会自动把刚才文件里的文本 NA 识别并转换成了 NaN（Not a Number，真正的空值）。
+# print(data)
 
-# 缺失值处理
-inputs,outputs = data.iloc[0:,0:2],data.iloc[0:,2]
-inputs = inputs.fillna(inputs.mean(numeric_only=True)) # 用平均值填充缺失值
-inputs = pd.get_dummies(inputs,dummy_na=True)  
-#pd.get_dummies 会自动寻找表格里的所有字符串列，然后把它们拆分成几列全是 0 和 1 的“哑变量”
-# dummy_na=True 的意思是：“请把 NaN（空值）也当成一种独立的类别，给它单独建一列。”
-# data = data.drop(columns=[data.isnull().sum().idxmax()]) # 删除包含最多 NaN 的列
-print(inputs)
+# # 缺失值处理
+# inputs,outputs = data.iloc[0:,0:2],data.iloc[0:,2]
+# inputs = inputs.fillna(inputs.mean(numeric_only=True)) # 用平均值填充缺失值
+# inputs = pd.get_dummies(inputs,dummy_na=True)  
+# #pd.get_dummies 会自动寻找表格里的所有字符串列，然后把它们拆分成几列全是 0 和 1 的“哑变量”
+# # dummy_na=True 的意思是：“请把 NaN（空值）也当成一种独立的类别，给它单独建一列。”
+# # data = data.drop(columns=[data.isnull().sum().idxmax()]) # 删除包含最多 NaN 的列
+# print(inputs)
 
-inputs,outputs = inputs.astype(float),outputs.astype(float) #先把 DataFrame 整体强制转换为 float 类型
-X,Y = torch.tensor(inputs.values,dtype=torch.float32),torch.tensor(outputs.values,dtype=torch.float32)
-print(X,Y)
-print(X.T,len(X.T))
+# inputs,outputs = inputs.astype(float),outputs.astype(float) #先把 DataFrame 整体强制转换为 float 类型
+# X,Y = torch.tensor(inputs.values,dtype=torch.float32),torch.tensor(outputs.values,dtype=torch.float32)
+# print(X,Y)
+# print(X.T,len(X.T))
 
-print(X.sum(),X.sum(axis=0),X.sum(axis=1),X.mean(),X.mean(axis=0),X.mean(axis=1)) 
-# axis = 0 按列求和 axis = 1 按行求和
-print(X.sum(axis=0,keepdims=True)) #keepdims=True 保留原来的维度
-print(X.cumsum(axis=0),X*X) # cumsum 累加 当前位置加上前面所有位置的值
-x=torch.tensor([1,2])
-y= torch.tensor([3,2])
-print(torch.dot(x,y)) # torch.dot 计算两个向量的点积
-print(torch.sum(x*y)) # torch.sum 计算两个向量的点积
+# print(X.sum(),X.sum(axis=0),X.sum(axis=1),X.mean(),X.mean(axis=0),X.mean(axis=1)) 
+# # axis = 0 按列求和 axis = 1 按行求和
+# print(X.sum(axis=0,keepdims=True)) #keepdims=True 保留原来的维度
+# print(X.cumsum(axis=0),X*X) # cumsum 累加 当前位置加上前面所有位置的值
+# x=torch.tensor([1,2])
+# y= torch.tensor([3,2])
+# print(torch.dot(x,y)) # torch.dot 计算两个向量的点积
+# print(torch.sum(x*y)) # torch.sum 计算两个向量的点积
 
+# 矩阵和向量的乘积
 A = torch.arange(12).reshape(4,3)
 x = torch.tensor([1,2,3]).T
-Ax = torch.mv(A,X) # torch.mv 计算矩阵和向量的乘积
+Ax = torch.mv(A,x) # torch.mv 计算矩阵和向量的乘积
 print(Ax)
+print(len(x))
+
+B = torch.arange(12).reshape(3,4)
+AB = torch.mm(A,B) # torch.mm 计算两个矩阵的乘积
+print(AB)
+
+torch.norm(x)  # torch.norm 计算向量的二范数
+torch.abs(x).sum() # 一范数 torch.abs 计算向量的绝对值，torch.sum 计算向量的和
+torch.norm(B) # torch.norm 矩阵的二范数
+
+
 
 
 
